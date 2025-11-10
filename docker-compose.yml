@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: billsnipe-postgres
+    environment:
+      POSTGRES_USER: billsnipe
+      POSTGRES_PASSWORD: billsnipe_dev
+      POSTGRES_DB: billsnipe
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U billsnipe"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Next.js Web Application
+  web:
+    build:
+      context: ./billsnipe_web
+      dockerfile: ../Dockerfile
+    container_name: billsnipe-web
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://billsnipe:billsnipe_dev@postgres:5432/billsnipe?schema=public
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NODE_ENV: development
+    volumes:
+      - ./billsnipe_web:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: npm run dev
+
+  # Redis (for caching and queues)
+  redis:
+    image: redis:7-alpine
+    container_name: billsnipe-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
