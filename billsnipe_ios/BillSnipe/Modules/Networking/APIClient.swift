@@ -23,12 +23,33 @@ struct APIClient {
     
     // MARK: - Accounts
     func getAccounts() async throws -> [UtilityAccount] {
-        try await networkService.request(endpoint: "/accounts")
+        let response: AccountsResponse = try await networkService.request(endpoint: "/accounts")
+        return response.accounts
     }
-    
+
+    func createAccount(region: String, provider: String?, accountNumber: String?) async throws -> UtilityAccount {
+        let request = CreateAccountRequest(region: region, provider: provider, accountNumber: accountNumber)
+        let response: CreateAccountResponse = try await networkService.request(
+            endpoint: "/accounts",
+            method: .post,
+            body: request
+        )
+        return response.account
+    }
+
     // MARK: - Savings
     func getSavingsReports(accountId: String) async throws -> [SavingsReport] {
         try await networkService.request(endpoint: "/savings/report?accountId=\(accountId)")
+    }
+
+    // MARK: - Plan Comparison
+    func comparePlans(accountId: String, region: String) async throws -> ComparisonResponse {
+        let request = ComparePlansRequest(accountId: accountId, region: region)
+        return try await networkService.request(
+            endpoint: "/plan/compare",
+            method: .post,
+            body: request
+        )
     }
 }
 
@@ -47,4 +68,24 @@ struct ImportUsageRequest: Codable {
 struct ImportResponse: Codable {
     let success: Bool
     let imported: Int
+}
+
+struct AccountsResponse: Codable {
+    let accounts: [UtilityAccount]
+}
+
+struct CreateAccountRequest: Codable {
+    let region: String
+    let provider: String?
+    let accountNumber: String?
+}
+
+struct CreateAccountResponse: Codable {
+    let success: Bool
+    let account: UtilityAccount
+}
+
+struct ComparePlansRequest: Codable {
+    let accountId: String
+    let region: String
 }
