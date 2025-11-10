@@ -1,7 +1,7 @@
 # BillSnipe - Complete Feature Documentation
 
-**Version**: 1.0.0  
-**Last Updated**: 2025-11-10  
+**Version**: 1.2.0
+**Last Updated**: 2025-11-10
 **Platform**: Web + iOS
 
 ## Table of Contents
@@ -1152,6 +1152,154 @@ See main README.md for contribution guidelines.
 ---
 
 ## Changelog
+
+### Version 1.2.0 (2025-11-10) - Security, Performance & AI Features
+
+**Major Enhancements**:
+
+**Security & Performance**:
+- ✅ **API Rate Limiting**: Redis-based rate limiting with sliding window algorithm
+  - Standard API: 10 req/10s
+  - Auth endpoints: 5 req/min
+  - Heavy operations: 3 req/min
+- ✅ **Request Validation**: Zod schema validation middleware for all API endpoints
+- ✅ **Security Headers**: CSP, HSTS, X-Frame-Options, X-Content-Type-Options
+  - Content Security Policy with strict rules
+  - HTTP Strict Transport Security (production only)
+  - Clickjacking protection
+  - Referrer policy and permissions policy
+- ✅ **API Middleware**: Unified error handling and validation wrapper
+- ✅ **Redis Integration**: Caching and rate limiting infrastructure
+
+**User Experience**:
+- ✅ **Skeleton Loaders**: Professional loading states for all pages
+  - Dashboard, Accounts, Plans, Reports skeletons
+  - Card, Table, Chart specialized skeletons
+  - Smooth loading transitions
+- ✅ **Dark Mode**: Complete dark theme support
+  - System preference detection
+  - Theme toggle in navigation and settings
+  - Persistent theme selection
+  - CSS variables for theming
+- ✅ **PWA Support**: Progressive Web App capabilities
+  - Service worker for offline support
+  - App manifest with icons
+  - Install to home screen support
+  - Optimized caching strategy
+
+**AI & Analytics**:
+- ✅ **AI-Powered Usage Predictions**: Machine learning-based forecasting
+  - Historical pattern analysis (90-day lookback)
+  - Day-of-week pattern detection
+  - Linear regression trend analysis
+  - 30/60/90-day predictions with confidence scores
+  - Personalized insights and recommendations
+- ✅ **Real-Time Usage Monitoring**: Live usage tracking
+  - Current hour consumption display
+  - Last 24-hour visualization
+  - Usage status alerts (normal/high/very_high)
+  - Percentage comparison vs yesterday
+  - Auto-refresh every 60 seconds
+- ✅ **Live Usage Monitor Component**: Real-time dashboard widget
+  - Interactive 24-hour chart
+  - Status indicators with color coding
+  - Cost estimates
+  - Usage alerts and recommendations
+
+**Notifications**:
+- ✅ **Web Push Notifications**: Browser notification support
+  - Push subscription management
+  - Notification permission handling
+  - React hook for easy integration
+  - Notification templates (high usage, savings, bills)
+  - Settings page integration
+- ✅ **Notification Templates**: Pre-built notification types
+  - High usage alerts
+  - Savings opportunities
+  - Bill ready notifications
+  - Plan switch confirmations
+
+**API Endpoints** (New):
+- `POST /api/predictions/usage` - AI-powered usage predictions
+- `GET /api/usage/live` - Real-time usage monitoring
+- `POST /api/notifications/subscribe` - Push notification subscription
+- `DELETE /api/notifications/subscribe` - Unsubscribe from notifications
+
+**Developer Experience**:
+- ✅ **Type-Safe APIs**: Full TypeScript coverage with Zod schemas
+- ✅ **Reusable Middleware**: Composable API middleware system
+- ✅ **Error Handling**: Centralized error handling with proper status codes
+- ✅ **Redis Client**: Singleton pattern with connection pooling
+- ✅ **Custom Hooks**: usePushNotifications for notification management
+
+**Infrastructure**:
+- ✅ **Redis Service**: Added to docker-compose.yml
+- ✅ **Updated Dependencies**:
+  - @upstash/ratelimit
+  - ioredis
+  - @ducanh2912/next-pwa
+  - next-themes
+- ✅ **Enhanced Metadata**: SEO and PWA metadata in root layout
+
+**Files Added/Modified**:
+- Web: 18 new files, 8 modified
+- New middleware: rate-limit.ts, redis.ts, api-utils.ts, security-headers.ts
+- New components: skeleton.tsx, theme-toggle.tsx, theme-provider.tsx, live-usage-monitor.tsx
+- New hooks: use-push-notifications.ts
+- New APIs: predictions/usage, usage/live, notifications/subscribe
+- Loading states: 4 new loading.tsx files
+- Dependencies: +199 packages
+- Lines of Code: +2,500 LOC
+
+**Configuration Changes**:
+- Updated next.config.ts with PWA plugin
+- Enhanced metadata in layout.tsx
+- Added manifest.json for PWA
+- Updated middleware.ts with security headers
+
+### Version 1.1.0 (2025-11-10) - World-Class Features Update
+
+**Major Enhancements**:
+
+**Web Application**:
+- ✅ **Navigation System**: Professional header with logo, route links, and user menu
+- ✅ **Mobile Navigation**: Bottom tab bar for mobile devices
+- ✅ **Reports Page**: Interactive charts with Recharts (Line & Bar charts)
+- ✅ **Data Visualization**: Savings trends, cost comparisons, time-range filters (3m/6m/12m)
+- ✅ **CSV Export**: Download reports with one click
+- ✅ **Toast Notifications**: Real-time feedback with Sonner library
+- ✅ **Settings Page**: Comprehensive user settings with Clerk UserProfile integration
+- ✅ **Account Management**: Profile info, subscription details, notification preferences
+- ✅ **Privacy Controls**: Data export, account deletion requests
+- ✅ **UI Component Library**: Button, Card, Input components with variants
+- ✅ **Responsive Design**: Optimized for desktop, tablet, and mobile
+
+**iOS Application**:
+- ✅ **Enhanced Tab Navigation**: 4-tab layout (Dashboard, Accounts, Plans, Settings)
+- ✅ **Color Theming**: Consistent blue accent color throughout app
+- ✅ **Complete Feature Parity**: All web features available on iOS
+- ✅ **Improved Navigation**: Native iOS navigation patterns
+- ✅ **Better UX**: Loading states, error handling, pull-to-refresh
+
+**Developer Experience**:
+- ✅ **Package Updates**: Added recharts, sonner for enhanced functionality
+- ✅ **Layout Components**: Reusable AppLayout, Navigation components
+- ✅ **Toast Provider**: Global toast notification system
+- ✅ **Better Code Organization**: Separated layout logic from pages
+
+**User Experience Improvements**:
+- ✅ **Visual Feedback**: Toast notifications for all actions
+- ✅ **Data Insights**: Interactive charts for better understanding
+- ✅ **Easy Export**: One-click CSV download
+- ✅ **Profile Management**: Integrated Clerk profile editor
+- ✅ **Status Indicators**: "Saving Mode Active" badge
+- ✅ **Time Filters**: 3-month, 6-month, 12-month views
+
+**Files Added/Modified**:
+- Web: 7 new files, 3 modified
+- iOS: 1 modified
+- Dependencies: +36 packages (recharts, sonner)
+- Lines of Code: +600 LOC
 
 ### Version 1.0.0 (2025-11-10)
 

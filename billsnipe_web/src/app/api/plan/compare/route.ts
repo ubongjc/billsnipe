@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/db'
 import { z } from 'zod'
+import { withApiMiddleware, apiResponse, heavyRateLimiter } from '@/lib/api-utils'
 
 const CompareRequestSchema = z.object({
   accountId: z.string().cuid(),
@@ -80,16 +81,15 @@ interface PlanComparison {
  *                       estimatedAnnualSavings:
  *                         type: number
  */
-export async function POST(req: NextRequest) {
-  try {
-    const { userId } = await auth()
+async function handleCompare(req: NextRequest) {
+  const { userId } = await auth()
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
-    const body = await req.json()
-    const validated = CompareRequestSchema.parse(body)
+  const body = await req.json()
+  const validated = CompareRequestSchema.parse(body)
 
     // Get the user from database
     const user = await prisma.user.findUnique({
@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
     // Sort by savings (highest first)
     comparisons.sort((a, b) => b.estimatedAnnualSavings - a.estimatedAnnualSavings)
 
-    return NextResponse.json({
+    return apiResponse({
       currentPlan: {
         provider: account.provider,
         estimatedMonthlyCost: calculateCurrentCost(usageData) / 3,
@@ -177,21 +177,13 @@ export async function POST(req: NextRequest) {
         totalUsage: usageData.reduce((sum, u) => sum + u.kWh, 0),
       },
     })
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
-      )
-    }
-
-    console.error('Error comparing plans:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
 }
+
+// Export wrapped handler with rate limiting and validation
+export const POST = withApiMiddleware(handleCompare, {
+  rateLimit: heavyRateLimiter,
+  validateBody: CompareRequestSchema,
+})
 
 // Helper function to calculate plan cost based on usage
 function calculatePlanCost(

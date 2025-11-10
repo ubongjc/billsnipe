@@ -21,11 +21,22 @@ struct MainTabView: View {
                 .tabItem {
                     Label("Dashboard", systemImage: "chart.bar.fill")
                 }
-            
+
+            AccountsManagementView()
+                .tabItem {
+                    Label("Accounts", systemImage: "bolt.fill")
+                }
+
+            PlanComparisonView()
+                .tabItem {
+                    Label("Plans", systemImage: "list.bullet.clipboard")
+                }
+
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }
         }
+        .accentColor(.blue)
     }
 }
