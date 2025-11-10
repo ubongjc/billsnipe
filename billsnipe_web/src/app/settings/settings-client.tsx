@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { UserProfile } from '@clerk/nextjs'
+import { ThemeSelect } from '@/components/theme-toggle'
+import { usePushNotifications } from '@/hooks/use-push-notifications'
 
 interface SettingsClientProps {
   user: {
@@ -23,6 +25,7 @@ interface SettingsClientProps {
 
 export function SettingsClient({ user, clerkUser }: SettingsClientProps) {
   const [isExporting, setIsExporting] = useState(false)
+  const pushNotifications = usePushNotifications()
 
   const handleExportData = async () => {
     setIsExporting(true)
@@ -138,6 +141,22 @@ export function SettingsClient({ user, clerkUser }: SettingsClientProps) {
 
           <Card>
             <CardHeader>
+              <CardTitle>Appearance</CardTitle>
+              <CardDescription>Customize the look and feel of the application</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="text-sm font-medium">Theme</p>
+                  <p className="text-xs text-muted-foreground">Choose your preferred theme</p>
+                </div>
+                <ThemeSelect />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Notifications</CardTitle>
               <CardDescription>Configure how you receive notifications</CardDescription>
             </CardHeader>
@@ -156,12 +175,46 @@ export function SettingsClient({ user, clerkUser }: SettingsClientProps) {
                 </div>
                 <input type="checkbox" defaultChecked className="h-4 w-4" />
               </div>
-              <div className="flex items-center justify-between py-3">
+              <div className="flex items-center justify-between py-3 border-b">
                 <div>
                   <p className="text-sm font-medium">Plan Switch Updates</p>
                   <p className="text-xs text-muted-foreground">Updates on plan switching status</p>
                 </div>
                 <input type="checkbox" defaultChecked className="h-4 w-4" />
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="text-sm font-medium">Push Notifications</p>
+                  <p className="text-xs text-muted-foreground">
+                    {pushNotifications.isSupported
+                      ? pushNotifications.isSubscribed
+                        ? 'Enabled - Get real-time alerts'
+                        : 'Enable browser notifications'
+                      : 'Not supported on this device'}
+                  </p>
+                </div>
+                {pushNotifications.isSupported && (
+                  <Button
+                    variant={pushNotifications.isSubscribed ? 'outline' : 'default'}
+                    size="sm"
+                    onClick={() => {
+                      if (pushNotifications.isSubscribed) {
+                        pushNotifications.unsubscribe()
+                        toast.success('Push notifications disabled')
+                      } else {
+                        pushNotifications.subscribe()
+                        toast.success('Push notifications enabled!')
+                      }
+                    }}
+                    disabled={pushNotifications.isLoading}
+                  >
+                    {pushNotifications.isLoading
+                      ? 'Loading...'
+                      : pushNotifications.isSubscribed
+                      ? 'Disable'
+                      : 'Enable'}
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>

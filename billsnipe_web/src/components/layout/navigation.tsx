@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { UserButton } from '@clerk/nextjs'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const routes = [
   { name: 'Dashboard', path: '/dashboard', icon: '📊' },
@@ -46,10 +47,11 @@ export function Navigation() {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium">
+            <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium dark:bg-green-900 dark:text-green-200">
               <span>💰</span>
               <span>Saving Mode Active</span>
             </div>
+            <ThemeToggle />
             <UserButton afterSignOutUrl="/" />
           </div>
         </div>
